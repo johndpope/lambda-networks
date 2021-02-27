@@ -34,7 +34,7 @@ class LambdaLayer(nn.Module):
     """
     def __init__(
         self,
-        dim,
+        in_channels: int,
         *,
         dim_k: int,
         n: Optional[int] = None,
@@ -44,7 +44,7 @@ class LambdaLayer(nn.Module):
         dim_u: int = 1
     )-> None:
         super().__init__()
-        dim_out = default(dim_out, dim)
+        dim_out = default(dim_out, in_channels)
         self.u = dim_u # intra-depth dimension
         self.num_heads = num_heads
 
@@ -52,9 +52,9 @@ class LambdaLayer(nn.Module):
         dim_v = dim_out // num_heads
 
         # Project input and context to get queries, keys & values
-        self.to_q = nn.Conv2d(dim, dim_k * num_heads, 1, bias = False)
-        self.to_k = nn.Conv2d(dim, dim_k * dim_u, 1, bias = False)
-        self.to_v = nn.Conv2d(dim, dim_v * dim_u, 1, bias = False)
+        self.to_q = nn.Conv2d(in_channels, dim_k * num_heads, 1, bias = False)
+        self.to_k = nn.Conv2d(in_channels, dim_k * dim_u, 1, bias = False)
+        self.to_v = nn.Conv2d(in_channels, dim_v * dim_u, 1, bias = False)
 
         self.norm_q = nn.BatchNorm2d(dim_k * num_heads)
         self.norm_v = nn.BatchNorm2d(dim_v * dim_u)
